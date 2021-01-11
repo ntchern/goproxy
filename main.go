@@ -27,10 +27,8 @@ func forward(res http.ResponseWriter, req *http.Request) {
 	if isBackend {
 		req.URL.Path = strings.SplitN(req.RequestURI, "api", 2)[1]
 		reverseProxyTo(backendURL, res, req)
-		return
 	} else {
 		reverseProxyTo(frontendURL, res, req)
-		return
 	}
 }
 
