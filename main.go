@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+const (
+	frontendURL = "http://localhost:3000"
+	backendURL  = "http://localhost:8080"
+)
+
 func main() {
 	proxyMux := http.NewServeMux()
 	proxyMux.HandleFunc("/", forward)
@@ -21,16 +26,16 @@ func forward(res http.ResponseWriter, req *http.Request) {
 	isBackend := strings.HasPrefix(req.RequestURI, "/api/") // Here we assume the only backend is "api"
 	if isBackend {
 		req.URL.Path = strings.SplitN(req.RequestURI, "api", 2)[1]
-		reverseProxyTo("8080", res, req)
+		reverseProxyTo(backendURL, res, req)
 		return
 	} else {
-		reverseProxyTo("3000", res, req)
+		reverseProxyTo(frontendURL, res, req)
 		return
 	}
 }
 
-func reverseProxyTo(port string, res http.ResponseWriter, req *http.Request) {
-	origin, _ := url.Parse("http://localhost:" + port)
+func reverseProxyTo(urlTo string, res http.ResponseWriter, req *http.Request) {
+	origin, _ := url.Parse(urlTo)
 	proxy := httputil.NewSingleHostReverseProxy(origin)
 
 	log.Println("Forwarding to:", origin, req.URL.Path)
